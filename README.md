@@ -55,5 +55,10 @@ python consumer/consumer.py
 python producer/producer.py
 ```
 
+### Importer le Dashboard
+Pour visualiser le dashboard clinique :
+1. Allez dans **Stack Management** > **Saved Objects** sur votre instance Kibana.
+2. Cliquez sur **Import** et sélectionnez le fichier `kibana/dashboard_monitoring.ndjson`.
+3. Le dashboard complet, incluant les jauges de gravité et le registre de triage, sera automatiquement recréé.
 
 Projet académique - 2026
