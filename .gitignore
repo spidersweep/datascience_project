@@ -1,0 +1,25 @@
+# Python - Fichiers de compilation et cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environnement virtuel (À NE JAMAIS PUSHER)
+venv/
+.venv/
+env/
+
+# IDE - Configuration propre à ton PC
+.vscode/
+.idea/
+*.swp
+
+# OS - Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs et données locales
+*.log
+temp_data/
+.env
