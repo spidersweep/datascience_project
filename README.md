@@ -1,8 +1,8 @@
-# 💓 Real-Time Cardiac Monitoring Pipeline (Kafka & ELK)
+# Real-Time Cardiac Monitoring Pipeline (Kafka & ELK)
 
 Ce projet implémente un pipeline de données Big Data conçu pour la surveillance en temps réel de la pression artérielle. Il permet de filtrer les flux de données cliniques pour identifier et visualiser instantanément les cas d'urgence médicale.
 
-## 🏗️ Architecture du Système
+## Architecture du Système
 Le pipeline repose sur une architecture "Event-Driven" optimisée pour la haute disponibilité et la scalabilité :
 
 1. **Patient Data Producer (Python)** : Simule des capteurs médicaux connectés générant des flux de données au format FHIR (ID patient, timestamp, pressions systolique et diastolique).
@@ -13,14 +13,14 @@ Le pipeline repose sur une architecture "Event-Driven" optimisée pour la haute 
 
 
 
-## 📊 Dashboard de Supervision Médicale
+## Dashboard de Supervision Médicale
 L'interface Kibana offre une vue décisionnelle complète :
 * **Indices de Gravité (Gauges)** : Suivi en temps réel du pic de tension (Max) et de la moyenne du service pour une évaluation rapide du danger.
 * **Analyse de Tendance (Line Chart)** : Monitoring des cycles de pression artérielle et détection des pics temporels.
 * **Typologie des Risques (Pie Chart)** : Répartition qualitative des types d'hypertension détectés.
 * **Registre de Triage (Table)** : Liste priorisée des 5 patients les plus critiques pour une intervention immédiate.
 
-## 🚀 Installation & Utilisation
+## Installation & Utilisation
 
 ### Pré-requis
 * Docker & Docker-Compose
@@ -30,3 +30,13 @@ L'interface Kibana offre une vue décisionnelle complète :
 ### Lancement de l'infrastructure
 ```bash
 docker-compose up -d
+# Lancer le consommateur (détection d'anomalies)
+python consumer/anomaly_detector.py
+
+# Lancer le producteur (simulation des données patients)
+python producer/patient_producer.py
+```
+
+Projet académique 2026
+
+Projet académique - 2026
