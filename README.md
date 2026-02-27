@@ -11,24 +11,24 @@ Le pipeline repose sur une architecture "Event-Driven" optimisée pour la haute 
 4. **Storage & Indexing (Elasticsearch)** : Utilisation d'un index dédié `bp_anomalies` pour stocker les dossiers critiques de manière optimisée.
 5. **Clinical Dashboard (Kibana)** : Interface de visualisation pour les professionnels de santé.
 
-## 📂 Structure du Répertoire
+## Structure du Répertoire
 
 L'organisation du projet suit une architecture modulaire pour séparer la génération, le traitement et la visualisation des données :
 
 ```text
-📦 cardiac-monitoring-kafka
+ cardiac-monitoring-kafka
  ┣ 📂 producer
- ┃ ┗ 📜 patient_producer.py      # Script de simulation des capteurs FHIR (Kafka Producer)
+ ┃ ┗ patient_producer.py      # Script de simulation des capteurs FHIR (Kafka Producer)
  ┣ 📂 consumer
- ┃ ┗ 📜 anomaly_detector.py      # Script de filtrage et d'indexation vers Elasticsearch
+ ┃ ┗ anomaly_detector.py      # Script de filtrage et d'indexation vers Elasticsearch
  ┣ 📂 kibana
- ┃ ┗ 📜 dashboard_export.ndjson  # Export des visualisations et du dashboard clinique
+ ┃ ┗ dashboard_export.ndjson  # Export des visualisations et du dashboard clinique
  ┣ 📂 docs
- ┃ ┗ 📜 architecture_diagram.png # Schéma technique du pipeline de données
- ┣ 📜 docker-compose.yml         # Orchestration des services Kafka, Zookeeper et ELK
- ┣ 📜 requirements.txt           # Liste des dépendances Python (kafka-python, elasticsearch)
- ┣ 📜 .gitignore                 # Exclusion des fichiers temporaires et des caches Python
- ┗ 📜 README.md                  # Documentation principale du projet
+ ┃ ┗ architecture_diagram.png # Schéma technique du pipeline de données
+ ┣ docker-compose.yml         # Orchestration des services Kafka, Zookeeper et ELK
+ ┣ requirements.txt           # Liste des dépendances Python (kafka-python, elasticsearch)
+ ┣ .gitignore                 # Exclusion des fichiers temporaires et des caches Python
+ ┗ README.md                  # Documentation principale du projet
 ```
 
 ## Dashboard de Supervision Médicale
