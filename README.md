@@ -18,9 +18,9 @@ L'organisation du projet suit une architecture modulaire pour séparer la géné
 ```text
  cardiac-monitoring-kafka
  ┣ 📂 producer
- ┃ ┗ patient_producer.py      # Script de simulation des capteurs FHIR (Kafka Producer)
+ ┃ ┗ producer.py      # Script de simulation des capteurs FHIR (Kafka Producer)
  ┣ 📂 consumer
- ┃ ┗ anomaly_detector.py      # Script de filtrage et d'indexation vers Elasticsearch
+ ┃ ┗ consumer.py      # Script de filtrage et d'indexation vers Elasticsearch
  ┣ 📂 kibana
  ┃ ┗ dashboard_export.ndjson  # Export des visualisations et du dashboard clinique
  ┣ 📂 docs
@@ -49,12 +49,11 @@ L'interface Kibana offre une vue décisionnelle complète :
 ```bash
 docker-compose up -d
 # Lancer le consommateur (détection d'anomalies)
-python consumer/anomaly_detector.py
+python consumer/consumer.py
 
 # Lancer le producteur (simulation des données patients)
-python producer/patient_producer.py
+python producer/producer.py
 ```
 
-Projet académique 2026
 
 Projet académique - 2026
