@@ -1,59 +1,26 @@
-"""
-Script Consumer / module de tri
-
-Ce que fait ce script :
-- Lit les messages FHIR (Observation) envoyés dans Kafka
-- Extrait les valeurs de pression artérielle systolique et diastolique
-- Applique les règles médicales :
-    systolique > 140 ou < 90  => anomalie
-    diastolique > 90 ou < 60 => anomalie
-- Si la mesure est NORMALE  -> ajoute le JSON dans un fichier d’archive local (format JSON Lines)
-- Si la mesure est ANORMALE -> envoie un document simplifié vers Elasticsearch
-  (pour visualisation dans Kibana)
-
-Exécution (après installation des dépendances) :
-    pip install kafka-python requests
-
-Puis lancement :
-    python consumer.py
-
-"""
 
 import json
 import os
 import time
 from datetime import datetime, timezone
-
 import requests
 from kafka import KafkaConsumer
 
 
-# --- Config (keep localhost to match your teammate's instruction) ---
+# Configuration
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
 TOPIC = os.getenv("KAFKA_TOPIC", "pression_arterielle")  # must match producer.py
 GROUP_ID = os.getenv("KAFKA_GROUP_ID", "bp-consumer-group")
 
-# Elasticsearch (your teammate will run it on their machine)
+# Elasticsearch 
 ELASTIC_URL = os.getenv("ELASTIC_URL", "http://localhost:9200")
 ELASTIC_INDEX = os.getenv("ELASTIC_INDEX", "bp_anomalies")
 
-# Local archive for normal observations (JSON Lines = 1 JSON per line)
 NORMAL_ARCHIVE_PATH = os.getenv("NORMAL_ARCHIVE_PATH", "normal_observations.jsonl")
 
-
-def extract_bp_values(fhir_obs: dict) -> tuple[float | None, float | None]:
-    """
-    Extraction des valeurs de pression artérielle systolique et diastolique à partir d’une structure FHIR de type Observation, comme celle envoyée par producer.py.
-Emplacement attendu :
-- fhir_obs["component"] est une liste contenant :
-le code 8480-6 (pression systolique)
-le code 8462-4 (pression diastolique)
-chaque composant contient la valeur dans valueQuantity.value
-
-Retourne :
-(systolique, diastolique)
-ou (None, None) si les valeurs sont absentes.
-    """
+# Fonctions
+def extract_bp_values(fhir_obs: dict):
+    """Retourne systolique et diastolique à partir de la ressource FHIR"""
     systolic = None
     diastolic = None
 
@@ -73,10 +40,8 @@ ou (None, None) si les valeurs sont absentes.
     return systolic, diastolic
 
 
-def classify_bp(systolic: float, diastolic: float) -> tuple[bool, list[str]]:
-    """
-    Returns (is_anomaly, anomaly_types)
-    """
+def classify_bp(systolic, diastolic):
+       """Retourne True si anomalie + liste des types d'anomalie"""
     anomaly_types: list[str] = []
 
     if systolic > 140:
@@ -91,30 +56,26 @@ def classify_bp(systolic: float, diastolic: float) -> tuple[bool, list[str]]:
     return (len(anomaly_types) > 0), anomaly_types
 
 
-def archive_normal(fhir_obs: dict) -> None:
-    """
-    Append to local JSONL file. This is the 'archive locally' requirement.
-    """
+def archive_normal(fhir_obs):
+        """Sauvegarde les observations normales dans un fichier JSON Lines"""
     with open(NORMAL_ARCHIVE_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(fhir_obs, ensure_ascii=False))
         f.write("\n")
 
 
-def push_to_elasticsearch(doc: dict) -> None:
-    """
-    Index anomaly document to Elasticsearch.
-    Uses the Index API: POST /{index}/_doc
-    """
+def push_to_elasticsearch(doc):
+       """Envoie les anomalies vers Elasticsearch"""
+    
     url = f"{ELASTIC_URL.rstrip('/')}/{ELASTIC_INDEX}/_doc"
     r = requests.post(url, json=doc, timeout=10)
     # Raise if not 2xx so you see problems quickly
     r.raise_for_status()
 
 
-def build_anomaly_doc(fhir_obs: dict, systolic: float, diastolic: float, anomaly_types: list[str]) -> dict:
-    """
-    A simplified document for Kibana. Keeps key fields + anomaly metadata.
-    """
+def build_anomaly_doc(fhir_obs, systolic, diastolic, anomaly_types: list[str]) -> dict:
+
+    """Crée un document simplifié pour Kibana"""
+
     patient_ref = ((fhir_obs.get("subject") or {}).get("reference")) or ""
     observation_id = fhir_obs.get("id")
 
@@ -134,7 +95,7 @@ def build_anomaly_doc(fhir_obs: dict, systolic: float, diastolic: float, anomaly
         "ingested_at": datetime.now(timezone.utc).isoformat(),
     }
 
-
+#  Boucle principale 
 def main() -> None:
     print("Starting BP consumer (Membre 2). Ctrl+C to stop.")
     print(f"- Kafka: {KAFKA_BOOTSTRAP} | topic: {TOPIC} | group: {GROUP_ID}")
