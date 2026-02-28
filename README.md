@@ -1,9 +1,9 @@
-# Real-Time Cardiac Monitoring Pipeline (Kafka & ELK)
+# Real-time cardiac monitoring Pipeline (Kafka & ELK)
 
 Ce projet implémente un pipeline de données Big Data conçu pour la surveillance en temps réel de la pression artérielle, tout en constituant une simulation académique d’un système de monitoring. Les données de pression artérielle sont entièrement générées de manière synthétique à l’aide de scripts Python et ne proviennent d’aucun dispositif médical réel. L’objectif est de démontrer la capacité du pipeline, basé sur le standard FHIR, à traiter, filtrer et visualiser en continu des flux de données cliniques simulées, afin d’identifier et d’analyser automatiquement les anomalies détectées.
 
 
-## Architecture du Système
+## Architecture du système
 Le pipeline repose sur une architecture "Event-Driven" optimisée pour la haute disponibilité et la scalabilité :
 
 1. **Patient Data Producer (Python)** : Simule des capteurs médicaux connectés générant des flux de données au format FHIR (ID patient, timestamp, pressions systolique et diastolique).
@@ -12,7 +12,7 @@ Le pipeline repose sur une architecture "Event-Driven" optimisée pour la haute 
 4. **Storage & Indexing (Elasticsearch)** : Utilisation d'un index dédié `bp_anomalies` pour stocker les dossiers critiques de manière optimisée.
 5. **Clinical Dashboard (Kibana)** : Interface de visualisation pour l’analyse et la supervision des flux de données simulées.
 
-## Structure du Répertoire
+## Structure du répertoire
 
 L'organisation du projet suit une architecture modulaire pour séparer la génération, le traitement et la visualisation des données :
 
@@ -32,14 +32,14 @@ L'organisation du projet suit une architecture modulaire pour séparer la géné
  ┗ README.md                  # Documentation principale du projet
 ```
 
-## Dashboard de Supervision Médicale
+## Dashboard de supervision médicale
 L'interface Kibana offre une vue décisionnelle complète :
-* **Indices de Gravité (Gauges)** : Suivi en temps réel du pic de tension (Max) et de la moyenne du service pour une évaluation rapide du danger.
-* **Analyse de Tendance (Line Chart)** : Monitoring des cycles de pression artérielle et détection des pics temporels.
-* **Typologie des Risques (Pie Chart)** : Répartition qualitative des types d'hypertension détectés.
+* **Indices de gravité (Gauges)** : Suivi en temps réel du pic de tension (Max) et de la moyenne du service pour une évaluation rapide du danger.
+* **Analyse de tendance (Line Chart)** : Monitoring des cycles de pression artérielle et détection des pics temporels.
+* **Typologie des risques (Pie Chart)** : Répartition qualitative des types d'hypertension détectés.
 * **Tableau de priorisation des anomalies détectées(Table)** : Liste priorisée des 5 patients les plus critiques pour une intervention immédiate.
 
-## Installation & Utilisation
+## Installation & utilisation
 
 ### Pré-requis
 * Docker & Docker-Compose
