@@ -1,5 +1,5 @@
 """
-Script Consumer / module de tri pour le projet (Membre 2)
+Script Consumer / module de tri pour le projet
 
 Ce que fait ce script :
 - Lit les messages FHIR (Observation) envoyés dans Kafka
