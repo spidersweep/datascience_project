@@ -9,16 +9,18 @@ from kafka.errors import KafkaError
 fake = Faker()
 
 TOPIC = "pression_arterielle"
-SLEEP_TIME = 5  # seconds between messages
+SLEEP_TIME = 5  # secondes entre chaque message
 
-# Create Kafka producer
+# Crée le producteur Kafka 
 producer = KafkaProducer(
     bootstrap_servers='localhost:9092',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
+# Générer 5 patients fixes au début
+patients = [str(uuid.uuid4()) for _ in range(5)]
 
-def generate_patient():
-    patient_id = str(uuid.uuid4())
+def generate_observation(patient_id):
+    """Génère une observation FHIR pour un patient donné."""
     timestamp = fake.date_time_between(start_date='-1d', end_date='now').isoformat()
 
     # 30% chance of anomaly
@@ -31,7 +33,7 @@ def generate_patient():
 
     return {
         "resourceType": "Observation",
-        "id": patient_id,
+        "id": str(uuid.uuid4()),  # ID unique pour chaque observation
         "status": "final",
         "code": {
             "coding": [{"system": "http://loinc.org", "code": "85354-9", "display": "Blood pressure panel"}]
@@ -51,9 +53,10 @@ def generate_patient():
     }
 
 def send_message(data):
+        """Envoie un message dans Kafka."""
     try:
         future = producer.send(TOPIC, data)
-        record_metadata = future.get(timeout=10)  # Wait for ack
+        record_metadata = future.get(timeout=10)  # Attendre l'accusé
         print(f"Message sent to {record_metadata.topic} partition {record_metadata.partition} offset {record_metadata.offset}")
     except KafkaError as e:
         print(f"Failed to send message: {e}")
@@ -62,8 +65,10 @@ def main():
     print("Starting blood pressure simulator.")
     try:
         while True:
-            data = generate_patient()
-            send_message(data)
+        # Pour chaque patient, générer et envoyer une observation
+             for patient_id in patients:
+                observation = generate_observation(patient_id)
+                send_message(observation)
             time.sleep(SLEEP_TIME)
     except KeyboardInterrupt:
         print("\nStopping simulator...")
