@@ -17,7 +17,7 @@ Le pipeline repose sur une architecture "Event-Driven" optimisée pour la haute 
 L'organisation du projet suit une architecture modulaire pour séparer la génération, le traitement et la visualisation des données :
 
 ```text
- cardiac-monitoring-kafka
+ datascience_project
  ┣ 📂 producer
  ┃ ┗ producer.py      # Script de simulation des capteurs FHIR (Kafka Producer)
  ┣ 📂 consumer
