@@ -1,4 +1,4 @@
-# Real-time cardiac monitoring Pipeline (Kafka & ELK)
+# "Real-Time Blood Pressure Monitoring with FHIR, Kafka, Elasticsearch & Kibana"
 
 Ce projet implémente un pipeline de données Big Data conçu pour la surveillance en temps réel de la pression artérielle, tout en constituant une simulation académique d’un système de monitoring. Les données de pression artérielle sont entièrement générées de manière synthétique à l’aide de scripts Python et ne proviennent d’aucun dispositif médical réel. L’objectif est de démontrer la capacité du pipeline, basé sur le standard FHIR, à traiter, filtrer et visualiser en continu des flux de données cliniques simulées, afin d’identifier et d’analyser automatiquement les anomalies détectées.
 
