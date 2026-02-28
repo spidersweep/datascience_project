@@ -25,7 +25,8 @@ L'organisation du projet suit une architecture modulaire pour séparer la géné
  ┣ 📂 kibana
  ┃ ┗ dashboard_export.ndjson  # Export des visualisations et du dashboard clinique
  ┣ 📂 docs
- ┃ ┗ architecture_diagram.png # Schéma technique du pipeline de données
+ ┃ ┗ kibana-dashboard.pdf # Dashboard Kibana : Triage et Détection d'Anomalies en Temps Réel
+ ┃ Message_FHIR_Project.py
  ┣ docker-compose.yml         # Orchestration des services Kafka, Zookeeper et ELK
  ┣ requirements.txt           # Liste des dépendances Python (kafka-python, elasticsearch)
  ┣ .gitignore                 # Exclusion des fichiers temporaires et des caches Python
