@@ -59,7 +59,7 @@ def send_message(data):
         print(f"Failed to send message: {e}")
 
 def main():
-    print("Starting blood pressure simulator. Press Ctrl+C to stop.")
+    print("Starting blood pressure simulator.")
     try:
         while True:
             data = generate_patient()
