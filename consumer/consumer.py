@@ -5,18 +5,19 @@ import time
 from datetime import datetime, timezone
 import requests
 from kafka import KafkaConsumer
-
+from typing import List
 
 # Configuration
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
 TOPIC = os.getenv("KAFKA_TOPIC", "pression_arterielle")  # must match producer.py
 GROUP_ID = os.getenv("KAFKA_GROUP_ID", "bp-consumer-group")
 
-# Elasticsearch 
+# Elasticsearch
 ELASTIC_URL = os.getenv("ELASTIC_URL", "http://localhost:9200")
 ELASTIC_INDEX = os.getenv("ELASTIC_INDEX", "bp_anomalies")
 
 NORMAL_ARCHIVE_PATH = os.getenv("NORMAL_ARCHIVE_PATH", "normal_observations.jsonl")
+
 
 # Fonctions
 def extract_bp_values(fhir_obs: dict):
@@ -41,8 +42,8 @@ def extract_bp_values(fhir_obs: dict):
 
 
 def classify_bp(systolic, diastolic):
-       """Retourne True si anomalie + liste des types d'anomalie"""
-    anomaly_types: list[str] = []
+    """Retourne True si anomalie + liste des types d'anomalie"""
+    anomaly_types: List[str] = []
 
     if systolic > 140:
         anomaly_types.append("hypertension_systolic")
@@ -57,30 +58,25 @@ def classify_bp(systolic, diastolic):
 
 
 def archive_normal(fhir_obs):
-        """Sauvegarde les observations normales dans un fichier JSON Lines"""
+    """Sauvegarde les observations normales dans un fichier JSON Lines"""
     with open(NORMAL_ARCHIVE_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(fhir_obs, ensure_ascii=False))
         f.write("\n")
 
 
 def push_to_elasticsearch(doc):
-       """Envoie les anomalies vers Elasticsearch"""
-    
+    """Envoie les anomalies vers Elasticsearch"""
     url = f"{ELASTIC_URL.rstrip('/')}/{ELASTIC_INDEX}/_doc"
     r = requests.post(url, json=doc, timeout=10)
-    # Raise if not 2xx so you see problems quickly
     r.raise_for_status()
 
 
-def build_anomaly_doc(fhir_obs, systolic, diastolic, anomaly_types: list[str]) -> dict:
-
+def build_anomaly_doc(fhir_obs, systolic, diastolic, anomaly_types: List[str]) -> dict:
     """Crée un document simplifié pour Kibana"""
-
     patient_ref = ((fhir_obs.get("subject") or {}).get("reference")) or ""
     observation_id = fhir_obs.get("id")
 
     effective_dt = fhir_obs.get("effectiveDateTime")
-    # Kibana likes an ISO date field; if missing, use now
     if not effective_dt:
         effective_dt = datetime.now(timezone.utc).isoformat()
 
@@ -95,7 +91,8 @@ def build_anomaly_doc(fhir_obs, systolic, diastolic, anomaly_types: list[str]) -
         "ingested_at": datetime.now(timezone.utc).isoformat(),
     }
 
-#  Boucle principale 
+
+# Boucle principale
 def main() -> None:
     print("Starting BP consumer (Membre 2). Ctrl+C to stop.")
     print(f"- Kafka: {KAFKA_BOOTSTRAP} | topic: {TOPIC} | group: {GROUP_ID}")
@@ -106,7 +103,7 @@ def main() -> None:
         TOPIC,
         bootstrap_servers=KAFKA_BOOTSTRAP,
         group_id=GROUP_ID,
-        auto_offset_reset="latest",  # start from newest if no committed offset
+        auto_offset_reset="latest",
         enable_auto_commit=True,
         value_deserializer=lambda m: json.loads(m.decode("utf-8")),
     )
@@ -131,11 +128,8 @@ def main() -> None:
                     push_to_elasticsearch(doc)
                     print(f" ANOMALY | sys/dia={systolic}/{diastolic} | {anomaly_types} | sent to ES")
                 except Exception as e:
-                    # If ES isn't reachable locally (which is normal on your machine),
-                    # you still want your code to keep running to validate logic.
                     print(f" ANOMALY | sys/dia={systolic}/{diastolic} | {anomaly_types} | ES push failed: {e}")
 
-            # small sleep to keep logs readable (optional)
             time.sleep(0.1)
 
     except KeyboardInterrupt:
