@@ -11,11 +11,12 @@ fake = Faker()
 TOPIC = "pression_arterielle"
 SLEEP_TIME = 5  # secondes entre chaque message
 
-# Crée le producteur Kafka 
+# Crée le producteur Kafka
 producer = KafkaProducer(
     bootstrap_servers='localhost:9092',
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
+
 # Générer 5 patients fixes au début
 patients = [str(uuid.uuid4()) for _ in range(5)]
 
@@ -33,10 +34,14 @@ def generate_observation(patient_id):
 
     return {
         "resourceType": "Observation",
-        "id": str(uuid.uuid4()),  # ID unique pour chaque observation
+        "id": str(uuid.uuid4()),
         "status": "final",
         "code": {
-            "coding": [{"system": "http://loinc.org", "code": "85354-9", "display": "Blood pressure panel"}]
+            "coding": [{
+                "system": "http://loinc.org",
+                "code": "85354-9",
+                "display": "Blood pressure panel"
+            }]
         },
         "subject": {"reference": f"Patient/{patient_id}"},
         "effectiveDateTime": timestamp,
@@ -53,25 +58,36 @@ def generate_observation(patient_id):
     }
 
 def send_message(data):
-        """Envoie un message dans Kafka."""
+    """Envoie un message dans Kafka."""
     try:
         future = producer.send(TOPIC, data)
-        record_metadata = future.get(timeout=10)  # Attendre l'accusé
-        print(f"Message sent to {record_metadata.topic} partition {record_metadata.partition} offset {record_metadata.offset}")
+        record_metadata = future.get(timeout=10)
+
+        print(
+            f"Message sent to {record_metadata.topic} "
+            f"partition {record_metadata.partition} "
+            f"offset {record_metadata.offset}"
+        )
+
     except KafkaError as e:
         print(f"Failed to send message: {e}")
 
 def main():
     print("Starting blood pressure simulator.")
+
     try:
         while True:
-        # Pour chaque patient, générer et envoyer une observation
-             for patient_id in patients:
+
+            # Pour chaque patient générer une observation
+            for patient_id in patients:
                 observation = generate_observation(patient_id)
                 send_message(observation)
+
             time.sleep(SLEEP_TIME)
+
     except KeyboardInterrupt:
         print("\nStopping simulator...")
+
     finally:
         producer.flush()
         producer.close()
