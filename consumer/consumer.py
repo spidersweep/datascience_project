@@ -7,6 +7,8 @@ import requests
 from kafka import KafkaConsumer
 from typing import List
 
+#TEST!!!!!
+
 # Configuration
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
 TOPIC = os.getenv("KAFKA_TOPIC", "pression_arterielle")  # must match producer.py
